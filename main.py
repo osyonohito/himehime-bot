@@ -15,6 +15,11 @@ DISCORD_BOT_TOKEN = os.getenv("DISCORD_BOT_TOKEN")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 ALLOWED_CHANNEL_ID = int(os.getenv("ALLOWED_CHANNEL_ID", "123456789012345678"))
 
+print(f"[DEBUG] OPENAI_API_KEY: {repr(OPENAI_API_KEY)}")
+print(f"[DEBUG] DISCORD_BOT_TOKEN: {repr(DISCORD_BOT_TOKEN)}")
+print(f"[DEBUG] ALLOWED_CHANNEL_ID: {repr(ALLOWED_CHANNEL_ID)}")
+
+
 # Discord Bot の設定
 intents = discord.Intents.default()
 intents.message_content = True  # ユーザーのメッセージを拾うために必要！
