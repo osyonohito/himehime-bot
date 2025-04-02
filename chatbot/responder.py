@@ -1,4 +1,4 @@
-from openai import OpenAI
+import openai
 from chatbot.rag_chain import load_rag_chain
 from chatbot.character_config import CharacterConfig
 from chatbot.name_checker import generate_himeka_response
@@ -18,7 +18,7 @@ APOLOGY_RESPONSES = [
 
 class RAGResponder:
     def __init__(self, api_key):
-        self.client = OpenAI(api_key=api_key)
+        openai.api_key = api_key
         self.qa_chain = load_rag_chain(api_key)
         self.char_config = CharacterConfig()
         # 前回の謝罪応答を追跡するための辞書
@@ -275,8 +275,7 @@ class RAGResponder:
                 {"role": "user", "content": user_input}
             ]
 
-            # 3. ChatGPTに最終生成を依頼
-            response = self.client.chat.completions.create(
+            response = openai.ChatCompletion.create(
                 model="gpt-4o-mini",  # GPT-4o-mini - コスト効率と性能のバランスが良いモデル
                 messages=messages,
                 temperature=0.85,  # 多様性のために温度を上げる
