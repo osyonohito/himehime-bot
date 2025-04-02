@@ -5,3 +5,4 @@ faiss-cpu
 huggingface-hub
 python-dotenv
 langchain-community==0.3.20
+sentence-transformers
