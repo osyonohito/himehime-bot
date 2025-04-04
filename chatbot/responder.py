@@ -1,24 +1,31 @@
-import openai
-from chatbot.rag_chain import load_rag_chain
+import json
+import random
+from random import choice
+from langchain.chains import LLMChain
+from langchain.prompts import PromptTemplate
+from langchain_openai import ChatOpenAI
+from openai import OpenAI
 from chatbot.character_config import CharacterConfig
 from chatbot.name_checker import generate_himeka_response
-from random import choice
+from chatbot.rag_chain import load_rag_chain
 
-# 連続した謝罪への対応用応答リスト
+# 謝罪への応答バリエーション
 APOLOGY_RESPONSES = [
-    "もう何度も謝らなくていいわよ。とにかく次からは気をつけることね。",
-    "謝るだけじゃなくて行動で示してよね。まずは「ひめひめ」って呼んでみたら？",
-    "はぁ…何回謝れば気が済むの？そんなに謝るくらいなら最初から呼び方に気をつけなさいよ。",
-    "分かったわよ、もういいから。何度も謝られても困るわ。次からはちゃんと私のこと「ひめひめ」って呼ぶのよ？",
-    "何度目の謝罪かしら？本当に反省してるなら、もう二度と「定盛」なんて呼ばないでよね！",
-    "謝ってばかりで、あなたらしくないわね。まあいいわ、今回は許してあげる。でも次からは気をつけなさいよ。",
-    "謝る必要はないわ。ただ、私の名前を正しく呼んでくれればそれでいいの。",
-    "はいはい、分かったから。もう謝るの終わり？次は「ひめひめ」って呼んでみて？"
+    "もう、許してあげるわよ！次からは気をつけてね！",
+    "ふふん、今回だけは許してあげるわ！",
+    "まあいいわ、気にしないで！ひめひめはそんなに意地悪じゃないし♪",
+    "分かったわ！もう怒ってないから安心して！",
+    "うん、もういいわよ！あたしのこと、ちゃんとひめひめって呼んでくれればね♪",
+    "許してほしいならもっと褒めてよね！...冗談よ、もう許したわよ！",
+    "もう～、そんなに謝られたら怒れないじゃない！",
+    "何度謝っても変わらないわよ！...でも今回は許してあげる♪",
+    "あたしったら優しいから、すぐ許しちゃうんだから～！",
+    "そんなに謝られたら、可愛いあたしも許さないわけにはいかないわね！"
 ]
 
 class RAGResponder:
     def __init__(self, api_key):
-        openai.api_key = api_key
+        self.client = OpenAI(api_key=api_key)
         self.qa_chain = load_rag_chain(api_key)
         self.char_config = CharacterConfig()
         # 前回の謝罪応答を追跡するための辞書
@@ -275,7 +282,7 @@ class RAGResponder:
                 {"role": "user", "content": user_input}
             ]
 
-            response = openai.ChatCompletion.create(
+            response = self.client.chat.completions.create(
                 model="gpt-4o-mini",  # GPT-4o-mini - コスト効率と性能のバランスが良いモデル
                 messages=messages,
                 temperature=0.85,  # 多様性のために温度を上げる
